@@ -1,0 +1,88 @@
+pipeline {
+    agent {
+        label 'AGENT-1'
+    }
+
+    environment {
+        appVersion = ''
+        REGION = 'us-east-1'
+        ACC_ID = '850960379432'
+        PROJECT = 'robboshop'
+    }
+
+    options{
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        ansiColor('xterm')
+    }
+    
+    stages{
+        stage('Init'){
+            steps{
+                script {
+                    withAWS(credentials: 'aws-creds', region: 'us-east-1'){
+                        sh """
+                        cd 10-sg
+                        terraform init --reconfigure
+                        """
+                    }
+                }
+            }
+        }
+        stage('plan'){
+            steps{
+                script {
+                    withAWS(credentials: 'aws-creds', region: 'us-east-1'){
+                        sh """
+                        cd 10-sg
+                        terraform plan
+                        """
+                    }
+                }
+            }
+        }
+        stage('apply'){
+            input{
+                message "Should we continue?"
+                ok "yes we can.."
+                submitter "Arun"
+            }
+            steps{
+                script {
+                    withAWS(credentials: 'aws-creds', region: 'us-east-1'){
+                        sh """
+                        cd 10-sg
+                        terraform apply -auto-approve
+                        """
+                    }
+                }
+            }
+        }
+        //Triggering the DownStream Job
+        /* stage('Trigger the bastion EKS ACM ALB'){
+            steps{
+                script {
+                    build Job: '10-sg',
+                        propagate: false, // even SG fails VPC will not be effected
+                        wait: false // VPC will not wait for SG pipeline completion
+                }
+            }
+        } */
+    }
+
+    post {sssssss
+        always {
+            echo 'I will always say hello again'
+            deleteDir()
+        }
+
+        success {
+            echo 'Hello Success'
+        }
+
+        failure {
+            echo "Hello Failure"
+        }
+
+    }
+}
