@@ -59,15 +59,49 @@ pipeline {
             }
         }
         //Triggering the DownStream Job
-        /* stage('Trigger the bastion EKS ACM ALB'){
-            steps{
-                script {
-                    build Job: '10-sg',
-                        propagate: false, // even SG fails VPC will not be effected
-                        wait: false // VPC will not wait for SG pipeline completion
+        stage('Trigger the bastion EKS ACM ALB'){
+            parallel {
+                stage(trigger bastion) {
+                    steps{
+                        script {
+                            build job: '20-bastion',
+                            propagate: false,
+                            wait: false
+
+                        }
+                    }
+                }
+                stage(trigger EKS) {
+                    steps{
+                        script {
+                            build job: '80-eks',
+                            propagate: false,
+                            wait: false
+                        }
+                    }
+                }
+                stage(trigger ACM) {
+                    steps{
+                        script {
+                            build job: '60-acm',
+                            propagate: false,
+                            wait: false
+
+                        }
+                    }
                 }
             }
-        } */
+        }
+        stage(trigger ALB) {
+                    steps{
+                        script {
+                            build job: '70-ingress-alb',
+                            propagate: false,
+                            wait: false
+
+                        }
+                    }
+        }
     }
 
     post {
