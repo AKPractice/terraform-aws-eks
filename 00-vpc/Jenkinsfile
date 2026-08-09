@@ -45,7 +45,7 @@ pipeline {
             input{
                 message "Should we continue?"
                 ok "yes we can.."
-                submitter Arun
+                submitter "Arun"
             }
             steps{
                 script {
