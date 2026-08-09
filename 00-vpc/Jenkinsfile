@@ -41,7 +41,7 @@ pipeline {
                 }
             }
         }
-        stage('aplly'){
+        stage('apply'){
             input{
                 message "Should we continue?"
                 ok "yes we can.."
