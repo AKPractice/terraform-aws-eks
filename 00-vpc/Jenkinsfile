@@ -41,6 +41,38 @@ pipeline {
                 }
             }
         }
+        stage('aplly'){
+            input{
+                message "Should we continue?"
+                ok "yes we can.."
+                submitter Arun
+            }
+            steps{
+                script {
+                    withAWS(credentials: 'aws-creds', region: 'us-east-1'){
+                        sh """
+                        cd 00-vpc
+                        terraform apply -auto-approve
+                        """
+                    }
+                }
+            }
+        }
+
+        post {
+        always {
+            echo 'I will always say hello again'
+            deleteDir()
+        }
+
+        success {
+            echo 'Hello Success'
+        }
+
+        failure {
+            echo "Hello Failure"
+        }
+    }
     }
 
 }
