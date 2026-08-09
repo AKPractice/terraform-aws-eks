@@ -62,7 +62,7 @@ pipeline {
         stage('Trigger the SG'){
             steps{
                 script {
-                    build Job: '10-sg',
+                    build job: '10-sg',
                         propagate: false, // even SG fails VPC will not be effected
                         wait: false // VPC will not wait for SG pipeline completion
                 }
